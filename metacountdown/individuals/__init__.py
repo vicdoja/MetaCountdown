@@ -1,0 +1,2 @@
+from .LinearTreeIndividual import LinearTreeIndividual
+from .GeneralTreeIndividual import GeneralTreeIndividual

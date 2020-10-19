@@ -5,9 +5,10 @@ import re
 
 import numpy
 
+# pylint: disable=no-member
 from deap import algorithms
 from deap import base
-from deap import creator
+from deap import creator 
 from deap import tools
 
 import metacountdown.utils as utils
@@ -39,7 +40,8 @@ def init(obj=None, poss_num=None):
     #toolbox.register("gen_tree", utils.generate_tree_alt, POSSIBLE_NUMBERS=poss_num)
 
     # Structure initializers
-    toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.gen_tree)
+    toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.gen_tree, n=1)
+    #toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.gen_tree)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     toolbox.register("evaluate", utils.eval_sequence, OBJECTIVE=obj, POSSIBLE_NUMBERS=poss_num)
@@ -58,7 +60,7 @@ def main():
     random.seed(64)
     verbose = True
     max_gen = 300
-    pop_size = 1000
+    pop_size = 3000
 
     for obj, poss_num in utils.DIFFICULT_INSTANCES[:]:
         toolbox, pool, obj, poss_num = init(obj=obj, poss_num=poss_num)
@@ -78,8 +80,8 @@ def main():
 
         print("-"*30)
         print("The objective number is %d \nAnd the usable numbers are %s" % (obj, poss_num))
-        print(list(zip(hof, [(utils.eval_alt(i[0], i[1], poss_num), utils.eval_sequence_alt(i, obj, poss_num)[0]) for i in hof])))
-        #print(list(zip(hof, [(utils.eval_polish(i[0]), abs(utils.eval_polish(i[0])-obj)) for i in hof])))
+        #print(list(zip(hof, [(utils.eval_alt(i[0], i[1], poss_num), utils.eval_sequence_alt(i, obj, poss_num)[0]) for i in hof])))
+        print(list(zip(hof, [(utils.eval_polish(i[0]), abs(utils.eval_polish(i[0])-obj)) for i in hof])))
         print()
 
 if __name__ == "__main__":

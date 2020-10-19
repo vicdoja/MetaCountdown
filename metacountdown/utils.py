@@ -1,13 +1,16 @@
+from typing import Union, Tuple
+
 import random
 import re
 
 OPS = {
-  "+": (lambda a, b: a + b),
-  "-": (lambda a, b: a - b),
-  "*": (lambda a, b: a * b),
-  "/": (lambda a, b: a / b)
+	"+": (lambda a, b: a + b),
+	"-": (lambda a, b: a - b),
+	"*": (lambda a, b: a * b),
+	"/": (lambda a, b: a / b)
 }
 OPS_LIST = list(OPS.keys())
+MAX_FIT = 10**6
 
 ALL_NUMBERS = 2*list(range(1,11)) + [25*i for i in range(1,5)]
 
@@ -24,7 +27,18 @@ DIFFICULT_INSTANCES = [
     (713, [5  , 50 , 1 , 8 , 75 , 8  ])
 ]
 
-def eval_polish(expression):
+def eval_polish(expression: str) -> Union[int, None]:
+    """Given a mathematic expression in reverse polish notation as a string, 
+    evaluate it and return the value.
+
+    Args:
+        expression (str): Expression to evaluate.
+
+    Returns:
+        Union[int, None]: Returns the evaluation of the expression if it's
+                          valid, None otherwise.
+
+    """    
     #print("eval_polish", expression)
     tokens = expression.split()
     stack = []
@@ -36,50 +50,39 @@ def eval_polish(expression):
             if token == "/" and arg2 == 0:
                 return None
             result = OPS[token](arg1, arg2)
-            if not isinstance(result, int):
+            if isinstance(result, float) and not result.is_integer():
                 return None
-            stack.append(result)
+            stack.append(int(result))
         else:
             stack.append(int(token))
 
     return stack.pop()
 
-def eval_sequence(individual, OBJECTIVE, POSSIBLE_NUMBERS):
-    #print("eval_seq", individual)
-    max_fit = 10**6
-    if any(x > y for x in [individual[0].count(str(t)) for t in POSSIBLE_NUMBERS] for y in [POSSIBLE_NUMBERS.count(t) for t in POSSIBLE_NUMBERS]):
-        return max_fit,
-    aux = eval_polish(individual[0])
-    if aux == None:
-        return max_fit,
-    return abs(aux-OBJECTIVE),
+def eval_linear(pos_num: Tuple[int, ...], terminals: Tuple[int, ...], \
+    operators: Tuple[str, ...]) -> int:
+    """[summary]
 
-def eval_alt(terminals, operators, POSSIBLE_NUMBERS):
-    acc = float(POSSIBLE_NUMBERS[terminals[0]])
+    Args:
+        pos_num (Tuple[int, ...]): Possible numbers.
+        terminals (Tuple[int, ...]): List of indexes for pos_num.
+        operators (Tuple[str, ...]): List of operators to apply.
+
+    Returns:
+        int: Returns the evaluation of the linear expression defined by
+             the parameters terminals and operators
+    """    
+    #print(terminals, operators)
+    res = int(pos_num[terminals[0]])
     for i, op in enumerate(operators):
-        acc = OPS[op](acc, POSSIBLE_NUMBERS[terminals[i+1]])
-    return acc
+        if op == "/" and pos_num[terminals[i+1]] == 0:
+            return MAX_FIT
+        res = OPS[op](res, pos_num[terminals[i+1]])
+        if isinstance(res, float) and not res.is_integer():
+            return MAX_FIT
+        res = int(res)
+    return res
 
-def eval_sequence_alt(individual, OBJECTIVE, POSSIBLE_NUMBERS):
-    terminals, operators = individual
-    
-    res = eval_alt(terminals, operators, POSSIBLE_NUMBERS)
-
-    if res < 0 or not res.is_integer():
-        return 10**6,
-
-    return abs(res - OBJECTIVE),
-
-
-def generate_tree(max_depth, POSSIBLE_NUMBERS):
-    if max_depth > 1:
-        left  = "%s" % str(random.choice(POSSIBLE_NUMBERS)) if random.random() > 0.5 else generate_tree(max_depth - 1, POSSIBLE_NUMBERS)
-        right = "%s" % str(random.choice(POSSIBLE_NUMBERS)) if random.random() > 0.5 else generate_tree(max_depth - 1, POSSIBLE_NUMBERS)
-        return "%s %s %s" % (left, right, random.choice(OPS_LIST))
-    else:
-        return "%d %d %s" % (random.choice(POSSIBLE_NUMBERS), random.choice(POSSIBLE_NUMBERS), random.choice(OPS_LIST))
-
-def generate_valid(max_depth, POSSIBLE_NUMBERS):
+def generate_valid_general(max_depth, POSSIBLE_NUMBERS):
     if len(POSSIBLE_NUMBERS) < 2:
         return "%d" % (POSSIBLE_NUMBERS[0])
 
@@ -91,115 +94,21 @@ def generate_valid(max_depth, POSSIBLE_NUMBERS):
     right_slice = shuffled[cut_point:]
 
     if max_depth > 1:
-        left  = "%s" % str(random.choice(left_slice)) if random.random() < 0.5 else generate_valid(max_depth - 1, left_slice)
-        right = "%s" % str(random.choice(right_slice)) if random.random() < 0.5 else generate_valid(max_depth - 1, right_slice)
+        left  = "%s" % str(random.choice(left_slice)) if random.random() < 0.5\
+            else generate_valid_general(max_depth - 1, left_slice)
+        right = "%s" % str(random.choice(right_slice)) if random.random() < 0.5\
+            else generate_valid_general(max_depth - 1, right_slice)
     else:
         left  = str(random.choice(left_slice))
         right = str(random.choice(right_slice))
 
     operator = random.choice(OPS_LIST)
 
-    if operator == "/" and eval_polish("%s %s %s" % (left, right, operator)) == None:
+    if operator == "/" and \
+        eval_polish("%s %s %s" % (left, right, operator)) == None:
         if random.random() < 0.1:
             return "%d" % (shuffled[0])
         else:
             operator = random.choice(OPS_LIST[:-1])
 
     return "%s %s %s" % (left, right, operator)
-
-def generate_tree_alt(POSSIBLE_NUMBERS):
-    terminals = tuple(random.sample(range(len(POSSIBLE_NUMBERS)), k=random.randint(1, len(POSSIBLE_NUMBERS))))
-    operators = tuple(random.choices(OPS_LIST[:-1], k=len(terminals)-1))
-    return terminals, operators
-
-def mutate_tree(ind, indpb, POSSIBLE_NUMBERS):
-    mutant = ""
-    for t in ind[0].split():
-        if random.random() < indpb:
-            if t in OPS_LIST:
-                mutant += " " + random.choice(OPS_LIST)
-            else:
-                mutant += " " + str(random.choice(POSSIBLE_NUMBERS))
-        else:
-            mutant += " " + t
-    ind[0] = mutant
-    return ind,
-
-def mutate_tree_valid(ind, indpb, POSSIBLE_NUMBERS):
-    # COMPLETE
-    bag = {}
-    mutant = ""
-    for t in ind[0].split():
-        if random.random() < indpb:
-            if t in OPS_LIST:
-                mutant += " " + random.choice(OPS_LIST)
-            else:
-                mutant += " " + str(random.choice(POSSIBLE_NUMBERS))
-        else:
-            mutant += " " + t
-    ind[0] = mutant
-    return ind,
-
-def mutate_tree_alt(ind, indpb, POSSIBLE_NUMBERS):
-    terminals, operators = list(ind[0]), list(ind[1])
-
-    
-
-    if len(terminals) == 1:
-        pass
-    elif len(terminals) == len(POSSIBLE_NUMBERS):
-        pass
-    else:
-        pass
-    return ind,
-
-def find_subtree(tree, p):
-    toks = tree.split()
-    toks.reverse()
-
-    if toks[p-1] not in OPS_LIST:
-        sel = toks[p-1]
-        toks[p-1] = "#"
-        wild = " ".join(reversed(toks))
-        #print([sel, wild])
-        return sel, wild
-
-    aux = 2
-    wild = ""
-    sel = ""
-
-    for t in toks:
-        if p > 0:
-            p -= 1
-            if p == 0:
-                sel = t
-                wild = "# " + wild
-            else:
-                wild = t + " " + wild
-        elif aux > 0:
-            if t in OPS_LIST:
-                aux += 1
-            else:
-                aux -= 1
-            sel = t + " " + sel
-        else:
-            wild = t + " " + wild
-    
-    #print([sel, wild])
-    return sel, wild
-
-def mate_tree(ind1, ind2):
-    p1, p2 = random.randint(1, len(ind1[0].split())), random.randint(1, len(ind2[0].split()))
-
-    sel1, wild1 = find_subtree(ind1[0], p1)
-    sel2, wild2 = find_subtree(ind2[0], p2)
-
-    '''print([wild1, wild2])
-    print([sel1, sel2])'''
-
-    ind1[0], ind2[0] = re.sub("#", sel2, wild1).strip(), re.sub("#", sel1, wild2).strip()
-
-    return ind1, ind2
-
-def mate_tree_alt(ind1, ind2):
-    return ind1, ind2
