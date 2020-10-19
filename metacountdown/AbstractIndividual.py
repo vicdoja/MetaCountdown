@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+
+from typing import Tuple
   
 class AbstractIndividual(ABC): 
   """Abstract class for every other individual.
@@ -14,9 +18,9 @@ class AbstractIndividual(ABC):
     """    
     pass
 
-  @abstractmethod
-  @staticmethod  
-  def evaluate_individual(ind: AbstractIndividual) -> int: 
+  @staticmethod
+  @abstractmethod  
+  def evaluate_individual(ind: AbstractIndividual) -> Tuple[int, ]: 
     """Calculate the fitness for a particular individual.
 
     Args:
@@ -27,8 +31,8 @@ class AbstractIndividual(ABC):
     """    
     pass
 
-  @abstractmethod
   @classmethod
+  @abstractmethod
   def generate_individual(cls) -> AbstractIndividual: 
     """Generate an individual.
 
@@ -37,9 +41,9 @@ class AbstractIndividual(ABC):
     """    
     pass
 
-  @abstractmethod
   @staticmethod
-  def mutate_individual(ind: AbstractIndividual): 
+  @abstractmethod
+  def mutate_individual(ind: AbstractIndividual) -> Tuple[AbstractIndividual, ]: 
     """Muate an individual in-place.
 
     Args:
@@ -47,9 +51,10 @@ class AbstractIndividual(ABC):
     """    
     pass
 
-  @abstractmethod
   @staticmethod
-  def mate_individual(ind1: AbstractIndividual, ind2: AbstractIndividual):
+  @abstractmethod
+  def mate_individual(ind1: AbstractIndividual, ind2: AbstractIndividual) \
+    -> Tuple[AbstractIndividual, AbstractIndividual]:
     """Mate two individuals in-place.
 
     Args:

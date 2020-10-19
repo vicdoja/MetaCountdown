@@ -1,3 +1,5 @@
+from typing import Union
+
 import random
 import re
 
@@ -8,6 +10,7 @@ OPS = {
   "/": (lambda a, b: a / b)
 }
 OPS_LIST = list(OPS.keys())
+MAX_FIT = 10**6
 
 ALL_NUMBERS = 2*list(range(1,11)) + [25*i for i in range(1,5)]
 
@@ -24,7 +27,17 @@ DIFFICULT_INSTANCES = [
     (713, [5  , 50 , 1 , 8 , 75 , 8  ])
 ]
 
-def eval_polish(expression):
+def eval_polish(expression: str) -> Union[float, None]:
+    """Given a mathematic expression in reverse polish notation as a string, 
+    evaluate it and return the value.
+
+    Args:
+        expression (str): Expression to evaluate.
+
+    Returns:
+        Union[float, None]: Returns the evaluation of the result if it's valid,
+                            None otherwise.
+    """    
     #print("eval_polish", expression)
     tokens = expression.split()
     stack = []
@@ -36,9 +49,9 @@ def eval_polish(expression):
             if token == "/" and arg2 == 0:
                 return None
             result = OPS[token](arg1, arg2)
-            if not isinstance(result, int):
+            if isinstance(result, float) and not result.is_integer():
                 return None
-            stack.append(result)
+            stack.append(int(result))
         else:
             stack.append(int(token))
 
