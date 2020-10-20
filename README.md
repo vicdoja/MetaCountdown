@@ -1,5 +1,23 @@
+![MetaCountdown's logo](./docs/twitter_header_photo_1.png)
+[![license](https://img.shields.io/github/license/vicdoja/MetaCountdown)](https://github.com/vicdoja/MetaCountdown/blob/main/LICENSE)
+
 # MetaCountdown
+> A complex problem made simple!
 
-![MetaCountdown logo](./docs/twitter_header_photo_1.png)
+(WIP)
 
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/vicdoja/MetaCountdown/blob/main/LICENSE)
+## Origin
+
+(WIP)
+
+## Contributing
+
+(WIP)
+
+## References
+
+(WIP)
+
+## License
+
+(WIP)
