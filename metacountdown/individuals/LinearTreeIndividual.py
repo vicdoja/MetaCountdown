@@ -15,18 +15,23 @@ class LinearTreeIndividual(AbstractIndividual):
 
 	"""
 
-	def __init__(self, nums: Tuple[int, ...], ops: Tuple[str, ...]) -> None:
+	def __init__(self, nums: Tuple[int, ...], ops: Tuple[str, ...], \
+		pos_num: List[int]) -> None:
 		"""Initialize the individual.
 
 		Args:
 			nums (Tuple[int, ...]): Terminals of the linear tree
 			ops (Tuple[str, ...]): Operators to apply along the linear tree
+			pos_num (List[int]): Possible numbers for the instance. Required 
+				for individual string representation
 		"""		
 		self.nums = nums
 		self.ops = ops
+		self.pos_num = pos_num
 
 	def __str__(self):
-		return " ".join([str(self.nums[0])]+["%s %d" % (self.ops[i], self.nums[i+1])\
+		return " ".join([str(self.pos_num[self.nums[0]])]+["%s %d" % \
+			(self.ops[i], self.pos_num[self.nums[i+1]]) \
 			for i in range(len(self.ops))])
 
 	@staticmethod  
@@ -63,7 +68,7 @@ class LinearTreeIndividual(AbstractIndividual):
 		terminals = tuple(random.sample(range(len(pos_num)), \
 			k=random.randint(1, len(pos_num))))
 		operators = tuple(random.choices(OPS_LIST[:-1], k=len(terminals)-1))
-		return cls(terminals, operators)
+		return cls(terminals, operators, pos_num)
 	
 	@staticmethod
 	def mutate_individual(ind: LinearTreeIndividual, pos_num: Tuple[int, ...], \
