@@ -13,7 +13,7 @@ setup(
     # *strongly* suggested for sharing
     version='0.1',
     # The license can be anything you like
-    license='MIT',
+    license='GPL-3.0',
     description='A Python package to solve Countdown\'s number round using metaheuristics.',
     keywords='metaheuristic metaheuristic-optimisation optimization-algorithms countdown genetic-algorithm simmulated-annealing',
     # We will also need a readme eventually (there will be a warning)
