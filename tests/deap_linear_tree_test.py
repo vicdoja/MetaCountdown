@@ -13,7 +13,9 @@ from deap import tools
 
 from metacountdown.individuals import LinearTreeIndividual
 
-from metacountdown.utils import ALL_NUMBERS, DIFFICULT_INSTANCES, eval_linear
+from metacountdown.utils import ALL_NUMBERS, DIFFICULT_INSTANCES, eval_linear\
+    , MAX_FIT
+from metacountdown.graphs.genetic import graph_min_vs_avg, graph_val_vs_inv
 
 def init(obj=None, poss_num=None):
     if not obj:
@@ -58,8 +60,8 @@ def init(obj=None, poss_num=None):
 def main():
     random.seed(64)
     verbose = True
-    max_gen = 10
-    pop_size = 3000
+    max_gen = 100
+    pop_size = 100
 
     for obj, poss_num in DIFFICULT_INSTANCES[:]:
         toolbox, pool, obj, poss_num = init(obj=obj, poss_num=poss_num)
@@ -68,10 +70,11 @@ def main():
         hof = tools.HallOfFame(1)
         stats = tools.Statistics(lambda ind: ind.fitness.values[0])
         stats.register("best", numpy.min)
+        stats.register("avg", numpy.min)
         stats.register("valid", lambda pop: (numpy.array(pop) < 10**6).sum())
         stats.register("invalid", lambda pop: (numpy.array(pop) >= 10**6).sum())
-        stats.register("% of valid", \
-         	lambda pop: (numpy.array(pop) < 10**6).sum()/len(pop))
+        stats.register("%% of valid", \
+         	lambda pop: (numpy.array(pop) < MAX_FIT).sum()/len(pop))
         
         pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.2, \
           	ngen=max_gen, stats=stats, halloffame=hof, verbose=verbose)
@@ -84,6 +87,8 @@ def main():
         print(list(zip(map(lambda o: str(o[0]),hof), \
             [(eval_linear(poss_num, i[0].nums, i[0].ops), \
 			abs(eval_linear(poss_num,i[0].nums,i[0].ops)-obj)) for i in hof])))
+        graph_min_vs_avg(log, False, True, hash((obj, tuple(poss_num))))
+        graph_val_vs_inv(log, False, True, hash((obj, tuple(poss_num))))
         print()
 
 if __name__ == "__main__":

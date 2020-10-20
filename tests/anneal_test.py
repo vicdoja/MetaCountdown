@@ -2,7 +2,8 @@ import random
 
 from simanneal import Annealer
 
-from metacountdown.utils import DIFFICULT_INSTANCES, generate_tree, generate_valid, eval_sequence, mutate_tree_valid, mutate_tree
+from metacountdown.utils import DIFFICULT_INSTANCES, eval_polish
+from metacountdown.individuals import LinearTreeIndividual
 
 class NumericalSequenceAnnealer(Annealer):
     def __init__(self, state, objective, poss_num):
@@ -11,28 +12,31 @@ class NumericalSequenceAnnealer(Annealer):
         super(NumericalSequenceAnnealer, self).__init__(state)  # important!
 
     def move(self):
-        self.state = mutate_tree(self.state, 0.05, self.poss_num)[0]
-        #self.state = mutate_tree_valid(self.state, 0.05, self.poss_num, self.objective)
+        self.state = LinearTreeIndividual.mutate_individual\
+            (self.state, self.poss_num, 0.05)[0]
 
     def energy(self):
-        return eval_sequence(self.state, self.objective, self.poss_num)[0]
+        return LinearTreeIndividual.evaluate_individual\
+            (self.state, self.objective, self.poss_num)[0]
 
 def main():
     random.seed(64)
     verbose = False
     max_gen = 300
 
-    for obj, poss_num in DIFFICULT_INSTANCES[:1]:
-        initial_tree = [generate_tree(2, poss_num)]
-
-        print(initial_tree)
+    for obj, poss_num in DIFFICULT_INSTANCES:
+        initial_tree = \
+            [LinearTreeIndividual.generate_individual(pos_num=poss_num)]
 
         annealer = NumericalSequenceAnnealer(initial_tree, obj,  poss_num)
 
-        auto_schedule = annealer.auto(minutes=1)
+        auto_schedule = annealer.auto(minutes=0.05)
         annealer.set_schedule(auto_schedule)
 
-        print(annealer.anneal())
+        result = annealer.anneal()
+        print()
+        print(result[0][0], LinearTreeIndividual.evaluate_individual(result[0],\
+            obj,poss_num)[0], obj)
 
 if __name__ == "__main__":
     main()
