@@ -8,7 +8,7 @@ The aim of this package is to find good (ideally optimal) solutions to problem o
 
 In general, what we are looking for is to find a binary tree ([7]) (where terminal nodes are numbers and non-terminal nodes are operators) such that its evaluation is the closest possible to the objective number.
 
-In order to achieve this, we use two different metaheuristics (thus the name of the package). The two metaheristics are genetic algorithms ([2]) and simulated annealing ([3]). For the genetic algorithms, the package called DEAP (Distributed Evolutionary Algorithms in Python) ([4]) is used, and for simulated annealing the package simanneal ([5]) is used. 
+In order to achieve this, we use two different metaheuristics (hence the name of the package). The two metaheristics are genetic algorithms ([2]) and simulated annealing ([3]). For the genetic algorithms, the package called DEAP (Distributed Evolutionary Algorithms in Python) ([4]) is used, and for simulated annealing the package simanneal ([5]) is used. 
 
 Here we use external packages just to make the initial development much simpler, but it's possible that in the future the package is extended so that it uses its own code for metaheuristics.
 
