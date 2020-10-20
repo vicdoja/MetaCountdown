@@ -14,11 +14,11 @@ Here we use external packages just to make the initial development much simpler,
 
 ## Origin
 
-The origin of this project is a subject of the Master's I'm enrolled in. We were required to use two different metaheuristics to optimize solutions of complex problems.
+The origin of this project is a subject of the Master's I'm enrolled in. There we were required to use two different metaheuristics to optimize solutions of a complex problem of choice.
 
 After seeing that I could implement and spin the code into a package, I did it without a doubt.
 
-Thanks to developing this project I now have a much wider undertanding of Python packages and project management.
+Thanks to developing this project I now have a much wider understanding of Python packages and project management.
 
 ## Contributing
 
