@@ -50,7 +50,13 @@ class LinearTreeIndividual(AbstractIndividual):
 		un_ind = ind[0]
 		terminals, operators = un_ind.nums, un_ind.ops
 		
-		res = eval_linear(pos_num, terminals, operators)
+		if len(set(terminals)) != len(terminals):
+			res = None
+		else:
+			res = eval_linear(pos_num, terminals, operators)
+
+		if not res:
+			return MAX_FIT,
 
 		return abs(res - objective),
 

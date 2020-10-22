@@ -53,17 +53,18 @@ class GeneralTreeIndividual(AbstractIndividual):
         return abs(aux-objective),
 
     @classmethod
-    def generate_individual(cls, pos_num: Tuple[int, ...]) \
+    def generate_individual(cls, pos_num: Tuple[int, ...], depth: int = 3) \
         -> GeneralTreeIndividual: 
         """Generate an individual.
 
         Args:
             pos_num (Tuple[int, ...]): Numbers available to use.
+            depth (int): Maximum depth of the tree
 
         Returns:
             GeneralTreeIndividual: Generated individual.
         """    
-        return cls(GeneralTreeIndividual.recursive_tree(pos_num, 3))
+        return cls(GeneralTreeIndividual.recursive_tree(pos_num, depth))
     
     @staticmethod
     def recursive_tree(pos_num: Tuple[int, ...], m_d: int) -> str:

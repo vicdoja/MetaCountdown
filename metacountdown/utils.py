@@ -3,6 +3,8 @@ from typing import Union, Tuple
 import random
 import re
 
+import numpy
+
 OPS = {
 	"+": (lambda a, b: a + b),
 	"-": (lambda a, b: a - b),
@@ -10,9 +12,10 @@ OPS = {
 	"/": (lambda a, b: a / b)
 }
 OPS_LIST = list(OPS.keys())
-MAX_FIT = 10**6
+MAX_FIT = numpy.Infinity
 
 ALL_NUMBERS = 2*list(range(1,11)) + [25*i for i in range(1,5)]
+ALL_NUMBERS_EXP = 3*list(range(1,11)) + 2*list(range(10,110,10)) + [25*i*10 for i in range(1,5)]
 
 DIFFICULT_INSTANCES = [
     (264, [9  , 6  , 75, 7 , 2  , 50 ]),
@@ -75,10 +78,10 @@ def eval_linear(pos_num: Tuple[int, ...], terminals: Tuple[int, ...], \
     res = int(pos_num[terminals[0]])
     for i, op in enumerate(operators):
         if op == "/" and pos_num[terminals[i+1]] == 0:
-            return MAX_FIT
+            return None
         res = OPS[op](res, pos_num[terminals[i+1]])
         if isinstance(res, float) and not res.is_integer():
-            return MAX_FIT
+            return None
         res = int(res)
     return res
 
